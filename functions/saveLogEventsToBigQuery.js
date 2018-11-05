@@ -34,17 +34,17 @@ function insertHandler(err, apiResponse) {
    */
   exports.saveLogEventsToBigQuery = (event, callback) => {
   
-    const BigQuery = require('@google-cloud/bigquery');
+    const {BigQuery} = require('@google-cloud/bigquery');
     const projectId = 'data-analysis-pipeline-12387'; 
     const datasetName = 'logEvents'
     const tableId = 'logEvents'
-    const bigQuery = BigQuery({ projectId: projectId });
+    const bigQuery = new BigQuery({ projectId: projectId });
   
     const pubsubMessage = event.data;
     const eventPayload = pubsubMessage.data ? Buffer.from(pubsubMessage.data, 'base64').toString() : 'World';
     console.log('received event '+eventPayload)
   
-    var transformedPayload = eventPayload; // Copy over all data.
+    var transformedPayload = JSON.parse(eventPayload); // Copy over all data.
     transformedPayload.Data = JSON.stringify(eventPayload.Data); // Stringify Data-field so we can log all events to the same primary table.
   
     const row = transformedPayload
@@ -52,12 +52,6 @@ function insertHandler(err, apiResponse) {
     bigQuery.dataset(datasetName)
       .table(tableId)
       .insert(row, insertHandler)
-      .then(function(){
-        console.log('inserted to DB: '+transformedPayload)
-      })
-      .catch(function(error){
-        console.error('failed to insert to db: '+error)
-      })
     
     callback();
   };
