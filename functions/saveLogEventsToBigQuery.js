@@ -36,22 +36,23 @@ function insertHandler(err, apiResponse) {
   
     const {BigQuery} = require('@google-cloud/bigquery');
     const projectId = 'data-analysis-pipeline-12387'; 
-    const datasetName = 'logEvents'
-    const tableId = 'logEvents'
+    const datasetName = 'logEvents';
+    const tableId = 'logEvents';
     const bigQuery = new BigQuery({ projectId: projectId });
   
     const pubsubMessage = event.data;
     const eventPayload = pubsubMessage.data ? Buffer.from(pubsubMessage.data, 'base64').toString() : 'World';
-    console.log('received event '+eventPayload)
+    console.log('received event '+eventPayload);
   
     var transformedPayload = JSON.parse(eventPayload); // Copy over all data.
-    transformedPayload.Data = JSON.stringify(eventPayload.Data); // Stringify Data-field so we can log all events to the same primary table.
-  
-    const row = transformedPayload
+    transformedPayload.Data = JSON.stringify(transformedPayload.Data); // Stringify Data-field so we can log all events to the same primary table.  
+    transformedPayload.ReceivedAt =  bigQuery.timestamp(new Date());
+
+    const row = transformedPayload;
   
     bigQuery.dataset(datasetName)
       .table(tableId)
-      .insert(row, insertHandler)
+      .insert(row, insertHandler);
     
     callback();
   };
