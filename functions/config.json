@@ -1,3 +1,7 @@
 {
-	"TOPIC" : "clientLogEvents"
+	"TOPIC" : "clientLogEvents",
+	"LOG_EVENT": {
+		"DATASET_NAME": "logEvents",
+		"TABLE_ID": "logEvents"
+	}
 }

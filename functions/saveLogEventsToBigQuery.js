@@ -34,26 +34,30 @@ function insertHandler(err, apiResponse) {
    */
   exports.saveLogEventsToBigQuery = (event, callback) => {
   
+    const config = require('./config.json');
     const {BigQuery} = require('@google-cloud/bigquery');
-    const projectId = 'data-analysis-pipeline-12387'; 
-    const datasetName = 'logEvents';
-    const tableId = 'logEvents';
-    const bigQuery = new BigQuery({ projectId: projectId });
+
+    const bigQuery = new BigQuery({ projectId: process.env.GCLOUD_PROJECT });
   
     const pubsubMessage = event.data;
-    const eventPayload = pubsubMessage.data ? Buffer.from(pubsubMessage.data, 'base64').toString() : 'World';
-    console.log('received event '+eventPayload);
+    const eventPayload = pubsubMessage.data ? Buffer.from(pubsubMessage.data, 'base64').toString() : null;
+    if (eventPayload != null){
+        console.log('received event '+eventPayload);
   
-    var transformedPayload = JSON.parse(eventPayload); // Copy over all data.
-    transformedPayload.Data = JSON.stringify(transformedPayload.Data); // Stringify Data-field so we can log all events to the same primary table.  
-    transformedPayload.ReceivedAt =  bigQuery.timestamp(new Date());
-
-    const row = transformedPayload;
-  
-    bigQuery.dataset(datasetName)
-      .table(tableId)
-      .insert(row, insertHandler);
+        var transformedPayload = JSON.parse(eventPayload); // Copy over all data.
+        transformedPayload.Data = JSON.stringify(transformedPayload.Data); // Stringify Data-field so we can log all events to the same primary table.  
+        transformedPayload.ReceivedAt =  bigQuery.timestamp(new Date());
     
+        const row = transformedPayload;
+      
+        bigQuery.dataset(config.LOG_EVENT.DATASET_NAME)
+          .table(config.LOG_EVENT.TABLE_ID)
+          .insert(row, insertHandler);    
+    }
+    else {
+        console.error("Failed to parse pubsub message: "+pubsubMessage.data)
+    }
+
     callback();
   };
   
