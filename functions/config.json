@@ -3,5 +3,9 @@
 	"LOG_EVENT": {
 		"DATASET_NAME": "logEvents",
 		"TABLE_ID": "logEvents"
+	},
+	"PLAYER_SESSIONS": {
+		"DATASET_NAME": "logEvents",
+		"TABLE_ID": "playerSessions"
 	}
 }
