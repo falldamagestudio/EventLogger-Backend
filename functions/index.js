@@ -3,7 +3,7 @@
 
 module.exports = Object.assign(
   require('./logEvents'),
-  require('./saveLogEventsToBigQuery'),
+  require('./saveLogEventsToBigQuery')
 );
 
 // exports.logEvents = require('logEvents');

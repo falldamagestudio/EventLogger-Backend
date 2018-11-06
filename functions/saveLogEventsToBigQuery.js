@@ -55,7 +55,7 @@ function insertHandler(err, apiResponse) {
           .insert(row, insertHandler);    
     }
     else {
-        console.error("Failed to parse pubsub message: "+pubsubMessage.data)
+        console.error("Failed to parse pubsub message: "+JSON.stringify(pubsubMessage));
     }
 
     callback();
